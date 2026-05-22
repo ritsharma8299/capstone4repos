@@ -26,8 +26,6 @@
 			{
 				"name": "WEB_Get_SQL_Server",
 				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -47,10 +45,8 @@
 				}
 			},
 			{
-				"name": "Web2",
+				"name": "WEB_Get_SQL_Database",
 				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -59,7 +55,15 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://capstone4keyvault-keyv.vault.azure.net/secrets/sql-database?api-version=7.4",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
 			},
 			{
 				"name": "SET_SQL_USERNAME",
@@ -83,28 +87,46 @@
 				}
 			},
 			{
-				"name": "Set variable2",
+				"name": "Set_SQL_Server",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "WEB_Get_SQL_Server",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_sql_server",
+					"value": "@activity('WEB_Get_SQL_Server').output.value"
+				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "Set_SQL_Database",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "WEB_Get_SQL_Database",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_sql_database",
+					"value": "@activity('WEB_Get_SQL_Database').output.value"
+				}
 			}
 		],
 		"parameters": {
