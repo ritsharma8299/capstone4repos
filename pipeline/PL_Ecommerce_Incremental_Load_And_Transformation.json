@@ -24,7 +24,7 @@
 				}
 			},
 			{
-				"name": "Web1",
+				"name": "WEB_Get_SQL_Server",
 				"type": "WebActivity",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -36,7 +36,15 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://capstone4keyvault.vault.azure.net/secrets/sql-server?api-version=7.4",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
 			},
 			{
 				"name": "Web2",
