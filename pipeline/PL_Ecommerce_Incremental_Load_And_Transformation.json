@@ -397,7 +397,21 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Users/updazvmnag_1777788724493@npupgradassessment.onmicrosoft.com/capstone_project_notebook"
+					"notebookPath": "/Users/updazvmnag_1777788724493@npupgradassessment.onmicrosoft.com/capstone_project_notebook",
+					"baseParameters": {
+						"raw_orders_path": {
+							"value": "@concat(\n'abfss://raw@',\npipeline().parameters.p_storage_account,\n'.dfs.core.windows.net/orders/run_id=',\npipeline().RunId\n)",
+							"type": "Expression"
+						},
+						"raw_customers_path": {
+							"value": "@concat(\n'abfss://raw@',\npipeline().parameters.p_storage_account,\n'.dfs.core.windows.net/customers/run_id=',\npipeline().RunId\n)",
+							"type": "Expression"
+						},
+						"storage-account-name": {
+							"value": "@pipeline().parameters.p_storage_account",
+							"type": "Expression"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "LS_AzureDatabricks_KeyVault",
