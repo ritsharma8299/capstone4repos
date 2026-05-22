@@ -127,6 +127,102 @@
 					"variableName": "v_sql_database",
 					"value": "@activity('WEB_Get_SQL_Database').output.value"
 				}
+			},
+			{
+				"name": "LKP_Old_Watermark",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SET_SQL_USERNAME",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set_SQL_Server",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set_SQL_Database",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT last_load_value\nFROM watermark_table\nWHERE source_table_name='orders'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Parameterized",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaName": "dbo",
+							"tableName": "watermark_table"
+						}
+					}
+				}
+			},
+			{
+				"name": "LKP_New_Watermark",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LKP_Old_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT MAX(last_updated) AS new_watermark\nFROM orders",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Parameterized",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaName": "dbo",
+							"tableName": "watermark_table"
+						}
+					}
+				}
+			},
+			{
+				"name": "IF_New_Data",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(\nticks(activity('LKP_New_Watermark').output.firstRow.new_watermark),\nticks(activity('LKP_Old_Watermark').output.firstRow.last_load_value)\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
