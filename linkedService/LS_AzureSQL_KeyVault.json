@@ -1,0 +1,37 @@
+{
+	"name": "LS_AzureSQL_KeyVault",
+	"properties": {
+		"parameters": {
+			"sqlUserName": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"sqlDatabase": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"sqlServer": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "@{linkedService().sqlServer}",
+			"database": "@{linkedService().sqlDatabase}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "@{linkedService().sqlUserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_AzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sql-password"
+			}
+		}
+	}
+}
