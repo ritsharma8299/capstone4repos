@@ -1,0 +1,132 @@
+{
+	"name": "PL_Ecommerce_Incremental_Load_And_Transformation",
+	"properties": {
+		"activities": [
+			{
+				"name": "WEB_Get_SQL_Username",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://capstone4keyvault.vault.azure.net/secrets/sql-username?api-version=7.4",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Web2",
+				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "SET_SQL_USERNAME",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WEB_Get_SQL_Username",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_sql_username",
+					"value": "@activity('WEB_Get_SQL_Username').output.value"
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Set variable3",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			}
+		],
+		"parameters": {
+			"p_source_schema": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"p_watermark_column": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"p_storage_account": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"variables": {
+			"v_sql_username": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"v_sql_server": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"v_sql_database": {
+				"type": "String",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": []
+	}
+}
