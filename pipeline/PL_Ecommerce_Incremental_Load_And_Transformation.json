@@ -498,15 +498,15 @@
 		"parameters": {
 			"p_source_schema": {
 				"type": "string",
-				"defaultValue": "0"
+				"defaultValue": "dbo"
 			},
 			"p_watermark_column": {
 				"type": "string",
-				"defaultValue": "0"
+				"defaultValue": "last_updated"
 			},
 			"p_storage_account": {
 				"type": "string",
-				"defaultValue": "0"
+				"defaultValue": "capstone4storageadls"
 			}
 		},
 		"variables": {
