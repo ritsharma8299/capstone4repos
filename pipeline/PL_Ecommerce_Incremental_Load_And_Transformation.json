@@ -303,6 +303,79 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Copy_customers_Incremental",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "CPY_Orders_Incremental",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat(\n'SELECT * FROM customers WHERE last_updated > ''',\nactivity('LKP_Old_Watermark').output.firstRow.last_load_value,\n''' AND last_updated <= ''',\nactivity('LKP_New_Watermark').output.firstRow.new_watermark,\n''''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_Parameterized",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaName": "dbo",
+							"tableName": "customers"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_Parquet_Parameterized",
+						"type": "DatasetReference",
+						"parameters": {
+							"containerName": "raw",
+							"folderPath": {
+								"value": "@concat('customers/run_id=',pipeline().RunId)",
+								"type": "Expression"
+							},
+							"fileName": "customers.parquet"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
