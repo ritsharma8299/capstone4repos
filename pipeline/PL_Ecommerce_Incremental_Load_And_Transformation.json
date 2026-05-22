@@ -396,9 +396,88 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/updazvmnag_1777788724493@npupgradassessment.onmicrosoft.com/capstone_project_notebook"
+				},
 				"linkedServiceName": {
 					"referenceName": "LS_AzureDatabricks_KeyVault",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SCR_Update_Watermark",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DBX_Ecommerce_Transformation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_KeyVault",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sqlUserName": "sqladmin",
+						"sqlDatabase": "capstone4db",
+						"sqlServer": "capstone4sqlserver.database.windows.net"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "@concat(\n'UPDATE watermark_table\nSET last_load_value = ''',\nactivity('LKP_New_Watermark').output.firstRow.new_watermark,\n''',\nlast_run_time = GETDATE()\nWHERE source_table_name = ''orders'''\n)"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "SCR_Insert_Audit",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "SCR_Update_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_KeyVault",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sqlUserName": "sqladmin",
+						"sqlDatabase": "capstone4db",
+						"sqlServer": "capstone4sqlserver.database.windows.net"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "@concat(\n'INSERT INTO audit_table\n(run_id,pipeline_name,source_name,load_type,start_time,end_time,status)\nVALUES\n(''',\npipeline().RunId,\n''',\n''PL_Ecommerce_Incremental_Load_And_Transformation'',\n''orders'',\n''incremental'',\nGETDATE(),\nGETDATE(),\n''Success'')'\n)"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
