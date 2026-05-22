@@ -1,0 +1,37 @@
+{
+	"name": "DS_SQL_Parameterized",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL_KeyVault",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"sqlUserName": "sqladmin",
+				"sqlDatabase": "capstone4db",
+				"sqlServer": "capstone4sqlserver.database.windows.net"
+			}
+		},
+		"parameters": {
+			"schemaName": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"tableName": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
+		}
+	}
+}

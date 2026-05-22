@@ -1,0 +1,49 @@
+{
+	"name": "DS_CSV_Returns",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_KeyVault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "returns.csv",
+				"folderPath": "returns",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "return_id",
+				"type": "String"
+			},
+			{
+				"name": "order_id",
+				"type": "String"
+			},
+			{
+				"name": "return_date",
+				"type": "String"
+			},
+			{
+				"name": "return_reason",
+				"type": "String"
+			},
+			{
+				"name": "refund_amount",
+				"type": "String"
+			},
+			{
+				"name": "return_status",
+				"type": "String"
+			}
+		]
+	}
+}
